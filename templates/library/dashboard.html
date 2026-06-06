@@ -1,0 +1,119 @@
+{% extends 'library/base.html' %}
+{% block title %}Dashboard – Library MS{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+
+<!-- ── Stat Cards ──────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+  {% for icon,label,val,bg,color in stat_cards %}
+  <div class="col-6 col-md-3">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="stat-icon" style="background:{{ bg }};">
+          <i class="bi bi-{{ icon }}" style="color:{{ color }};"></i>
+        </div>
+        <div>
+          <div class="fs-4 fw-bold">{{ val }}</div>
+          <div class="text-muted small">{{ label }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ── Quick Actions + Genre Chart ─────────────────────────── -->
+<div class="row g-3 mb-4">
+
+  <!-- Quick Actions -->
+  <div class="col-md-5">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white fw-semibold border-bottom-0 pt-3">
+        <i class="bi bi-lightning-charge text-warning me-1"></i> Quick Actions
+      </div>
+      <div class="card-body d-grid gap-2">
+        <a href="{% url 'book_add' %}"    class="btn btn-outline-primary text-start">
+          <i class="bi bi-plus-circle me-2"></i> Add New Book
+        </a>
+        <a href="{% url 'member_add' %}"  class="btn btn-outline-success text-start">
+          <i class="bi bi-person-plus me-2"></i> Register Member
+        </a>
+        <a href="{% url 'issue_book' %}"  class="btn btn-outline-warning text-start">
+          <i class="bi bi-arrow-up-circle me-2"></i> Issue a Book
+        </a>
+        <a href="{% url 'issued_books' %}" class="btn btn-outline-info text-start">
+          <i class="bi bi-clock-history me-2"></i> View Issued Books
+        </a>
+        <a href="{% url 'overdue_report' %}" class="btn btn-outline-danger text-start">
+          <i class="bi bi-exclamation-triangle me-2"></i> Overdue Report
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Genre Chart -->
+  <div class="col-md-7">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white fw-semibold border-bottom-0 pt-3">
+        <i class="bi bi-bar-chart text-primary me-1"></i> Books by Genre
+      </div>
+      <div class="card-body">
+        {% for g in genre_data %}
+        <div class="mb-2">
+          <div class="d-flex justify-content-between small mb-1">
+            <span>{{ g.genre }}</span>
+            <strong>{{ g.count }}</strong>
+          </div>
+          <div class="progress" style="height:10px;border-radius:10px;">
+            <div class="progress-bar" role="progressbar"
+                 style="width:{% widthratio g.count genre_max 100 %}%;background:#2980b9;border-radius:10px;"
+                 aria-valuenow="{{ g.count }}" aria-valuemax="{{ genre_max }}"></div>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-muted text-center mt-3">No books yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Recent Transactions ──────────────────────────────────── -->
+<div class="card shadow-sm">
+  <div class="card-header bg-white fw-semibold pt-3 border-bottom-0">
+    <i class="bi bi-clock-history text-secondary me-1"></i> Recent Transactions
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Book</th><th>Member</th><th>Issued</th><th>Due</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent_tx %}
+          <tr>
+            <td>{{ r.book.title|truncatechars:35 }}</td>
+            <td>{{ r.member.name }}</td>
+            <td>{{ r.issue_date }}</td>
+            <td>{{ r.due_date }}</td>
+            <td>
+              {% if r.is_returned %}
+                <span class="badge bg-success">Returned</span>
+              {% elif r.is_overdue %}
+                <span class="badge bg-danger">Overdue</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Active</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted py-3">No transactions yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

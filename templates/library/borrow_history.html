@@ -1,0 +1,50 @@
+{% extends 'library/base.html' %}
+{% block title %}Borrow History – Library MS{% endblock %}
+{% block page_title %}Full Borrow History{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-header bg-white fw-semibold pt-3 border-bottom-0">
+    <i class="bi bi-list-ul text-secondary me-1"></i>
+    All Transactions ({{ records.count }})
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr><th>#</th><th>Book</th><th>Member</th><th>Issued</th>
+              <th>Due</th><th>Returned</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for r in records %}
+          <tr>
+            <td class="text-muted small">{{ forloop.counter }}</td>
+            <td>
+              <a href="{% url 'book_detail' r.book.pk %}">{{ r.book.title|truncatechars:30 }}</a>
+            </td>
+            <td>{{ r.member.name }}</td>
+            <td>{{ r.issue_date }}</td>
+            <td>{{ r.due_date }}</td>
+            <td>{{ r.return_date|default:"—" }}</td>
+            <td>
+              {% if r.is_returned %}
+                {% if r.is_overdue %}
+                  <span class="badge bg-warning text-dark">Late Return</span>
+                {% else %}
+                  <span class="badge bg-success">On Time</span>
+                {% endif %}
+              {% elif r.is_overdue %}
+                <span class="badge bg-danger">Overdue</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Active</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No transactions yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

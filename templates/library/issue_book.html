@@ -1,0 +1,63 @@
+{% extends 'library/base.html' %}
+{% block title %}Issue Book – Library MS{% endblock %}
+{% block page_title %}Issue a Book{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="form-card">
+      <h5 class="fw-bold mb-1">
+        <i class="bi bi-arrow-up-circle text-warning me-2"></i>Issue Book to Member
+      </h5>
+      <p class="text-muted small mb-4">Enter the Book ID and Member ID to issue a book.</p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}
+        </div>
+        {% endif %}
+        <div class="mb-3">
+          <label class="form-label fw-medium">Book ID *</label>
+          {{ form.book_id }}
+          {% if form.book_id.errors %}
+            <div class="text-danger small">{{ form.book_id.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-medium">Member ID *</label>
+          {{ form.member_id }}
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-medium">Loan Period (days)</label>
+          {{ form.loan_days }}
+          <div class="form-text">Default is 14 days. Fine: ₹2 per overdue day.</div>
+        </div>
+        <button type="submit" class="btn btn-warning px-5 fw-semibold">
+          <i class="bi bi-check-circle me-1"></i> Issue Book
+        </button>
+      </form>
+    </div>
+
+    <!-- Info cards -->
+    <div class="row g-3 mt-1">
+      <div class="col-6">
+        <div class="card border-0 bg-light">
+          <div class="card-body text-center py-3">
+            <i class="bi bi-journals text-primary fs-3"></i>
+            <div class="small text-muted mt-1">Max 3 books per member</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="card border-0 bg-light">
+          <div class="card-body text-center py-3">
+            <i class="bi bi-cash text-danger fs-3"></i>
+            <div class="small text-muted mt-1">₹2/day fine for overdue</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

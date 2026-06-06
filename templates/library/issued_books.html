@@ -1,0 +1,68 @@
+{% extends 'library/base.html' %}
+{% block title %}Issued Books – Library MS{% endblock %}
+{% block page_title %}Currently Issued Books{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="fw-bold mb-0">
+    <i class="bi bi-clock-history me-2 text-info"></i>Currently Issued Books
+  </h5>
+  <a href="{% url 'issue_book' %}" class="btn btn-warning btn-sm">
+    <i class="bi bi-plus me-1"></i>Issue New
+  </a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Book</th><th>Member</th><th>Issued On</th>
+            <th>Due Date</th><th>Status</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records %}
+          <tr class="{% if r.is_overdue %}table-danger{% endif %}">
+            <td>
+              <a href="{% url 'book_detail' r.book.pk %}">{{ r.book.title|truncatechars:35 }}</a>
+              <div class="text-muted small">{{ r.book.book_id }}</div>
+            </td>
+            <td>
+              <a href="{% url 'member_detail' r.member.pk %}">{{ r.member.name }}</a>
+            </td>
+            <td>{{ r.issue_date }}</td>
+            <td>{{ r.due_date }}</td>
+            <td>
+              {% if r.is_overdue %}
+                <span class="badge bg-danger">
+                  ⚠ Overdue {{ r.overdue_days }}d | ₹{{ r.fine }}
+                </span>
+              {% else %}
+                <span class="badge bg-warning text-dark">
+                  {{ r.days_remaining }} day(s) left
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'return_book' r.pk %}" class="btn btn-sm btn-success">
+                <i class="bi bi-arrow-down-circle me-1"></i>Return
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+              <i class="bi bi-check-circle fs-2 d-block text-success mb-2"></i>
+              No books currently issued.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-footer text-muted small">Total issued: {{ records.count }}</div>
+</div>
+{% endblock %}

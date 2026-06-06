@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}Library MS{% endblock %}</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary:   #1e3a5f;
+      --accent:    #2980b9;
+      --sidebar-w: 250px;
+    }
+    body { background:#f0f4f8; font-family:'Segoe UI',sans-serif; }
+
+    /* ── Sidebar ─────────────────────────────── */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--primary);
+      position: fixed; top:0; left:0; z-index:1000;
+      transition: width .25s;
+    }
+    #sidebar .brand {
+      padding: 1.2rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,.15);
+      color:#fff; font-weight:700; font-size:1.1rem;
+      display:flex; align-items:center; gap:.6rem;
+    }
+    #sidebar .nav-link {
+      color:rgba(255,255,255,.8); padding:.65rem 1.2rem;
+      border-radius:6px; margin:.15rem .6rem;
+      display:flex; align-items:center; gap:.7rem;
+      font-size:.93rem; transition:background .2s;
+    }
+    #sidebar .nav-link:hover,
+    #sidebar .nav-link.active { background:var(--accent); color:#fff; }
+    #sidebar .nav-section {
+      font-size:.7rem; color:rgba(255,255,255,.4);
+      padding:.8rem 1.2rem .2rem; text-transform:uppercase; letter-spacing:.08em;
+    }
+
+    /* ── Main content ────────────────────────── */
+    #main { margin-left: var(--sidebar-w); min-height:100vh; }
+    .topbar {
+      background:#fff; padding:.75rem 1.5rem;
+      border-bottom:1px solid #dee2e6;
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:999;
+    }
+    .page-body { padding:1.5rem; }
+
+    /* ── Cards ───────────────────────────────── */
+    .stat-card {
+      border:none; border-radius:12px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .stat-card:hover { transform:translateY(-4px); box-shadow:0 8px 24px rgba(0,0,0,.12); }
+    .stat-icon {
+      width:52px; height:52px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.4rem;
+    }
+
+    /* ── Tables ──────────────────────────────── */
+    .table thead th {
+      background:var(--primary); color:#fff;
+      font-weight:500; font-size:.87rem;
+    }
+    .table-hover tbody tr:hover { background:#e8f4fd; }
+
+    /* ── Badges ──────────────────────────────── */
+    .badge-available    { background:#d4edda; color:#155724; }
+    .badge-issued       { background:#fff3cd; color:#856404; }
+    .badge-rare         { background:#f8d7da; color:#721c24; }
+    .badge-ref          { background:#cce5ff; color:#004085; }
+    .badge-overdue      { background:#f8d7da; color:#721c24; }
+
+    /* ── Forms ───────────────────────────────── */
+    .form-card { background:#fff; border-radius:12px;
+                 box-shadow:0 2px 12px rgba(0,0,0,.07); padding:2rem; }
+
+    /* ── Responsive ──────────────────────────── */
+    @media(max-width:768px){
+      #sidebar { width:0; overflow:hidden; }
+      #sidebar.show { width:var(--sidebar-w); }
+      #main { margin-left:0; }
+    }
+  </style>
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="brand">
+    <i class="bi bi-book-half fs-4"></i>
+    <span>Library MS</span>
+  </div>
+
+  <div class="nav-section">Main</div>
+  <a href="{% url 'dashboard' %}"    class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+    <i class="bi bi-speedometer2"></i> Dashboard
+  </a>
+
+  <div class="nav-section">Books</div>
+  <a href="{% url 'book_list' %}"    class="nav-link {% if 'book' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="bi bi-journals"></i> All Books
+  </a>
+  <a href="{% url 'book_add' %}"     class="nav-link">
+    <i class="bi bi-plus-circle"></i> Add Book
+  </a>
+
+  <div class="nav-section">Members</div>
+  <a href="{% url 'member_list' %}"  class="nav-link {% if 'member' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="bi bi-people"></i> All Members
+  </a>
+  <a href="{% url 'member_add' %}"   class="nav-link">
+    <i class="bi bi-person-plus"></i> Register Member
+  </a>
+
+  <div class="nav-section">Transactions</div>
+  <a href="{% url 'issue_book' %}"   class="nav-link {% if request.resolver_match.url_name == 'issue_book' %}active{% endif %}">
+    <i class="bi bi-arrow-up-circle"></i> Issue Book
+  </a>
+  <a href="{% url 'issued_books' %}" class="nav-link {% if request.resolver_match.url_name == 'issued_books' %}active{% endif %}">
+    <i class="bi bi-clock-history"></i> Issued Books
+  </a>
+
+  <div class="nav-section">Reports</div>
+  <a href="{% url 'overdue_report' %}" class="nav-link {% if request.resolver_match.url_name == 'overdue_report' %}active{% endif %}">
+    <i class="bi bi-exclamation-triangle"></i> Overdue
+  </a>
+  <a href="{% url 'borrow_history' %}" class="nav-link {% if request.resolver_match.url_name == 'borrow_history' %}active{% endif %}">
+    <i class="bi bi-list-ul"></i> Full History
+  </a>
+
+  <div class="mt-auto p-3" style="position:absolute;bottom:0;width:100%;">
+    <a href="{% url 'logout' %}" class="nav-link text-danger">
+      <i class="bi bi-box-arrow-left"></i> Logout
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══════════════════════════════════════════════════ -->
+<div id="main">
+  <!-- Top bar -->
+  <div class="topbar">
+    <button class="btn btn-sm btn-outline-secondary d-md-none" onclick="document.getElementById('sidebar').classList.toggle('show')">
+      <i class="bi bi-list"></i>
+    </button>
+    <span class="fw-semibold text-muted">{% block page_title %}{% endblock %}</span>
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-person-circle text-secondary"></i>
+      <span class="text-muted small">{{ user.username }}</span>
+    </div>
+  </div>
+
+  <!-- Flash messages -->
+  <div class="px-3 pt-2">
+    {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show" role="alert">
+      {{ msg }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Page content -->
+  <div class="page-body">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+{% else %}
+<!-- Not logged in: just render content full-width -->
+{% block content2 %}{% endblock %}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

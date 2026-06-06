@@ -1,0 +1,102 @@
+{% extends 'library/base.html' %}
+{% block title %}{{ book.title }} – Library MS{% endblock %}
+{% block page_title %}Book Detail{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <!-- Book info card -->
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body text-center py-4">
+        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+          <i class="bi bi-book-half text-primary fs-1"></i>
+        </div>
+        <h5 class="fw-bold">{{ book.title }}</h5>
+        <p class="text-muted">{{ book.author }}</p>
+        {% if book.status == 'Available' %}
+          <span class="badge badge-available fs-6 px-3 py-2">Available</span>
+        {% elif book.status == 'Issued' %}
+          <span class="badge badge-issued fs-6 px-3 py-2">Issued</span>
+        {% elif book.status == 'Rare' %}
+          <span class="badge badge-rare fs-6 px-3 py-2">🔒 Rare</span>
+        {% elif book.status == 'Reference Only' %}
+          <span class="badge badge-ref fs-6 px-3 py-2">🔒 Reference Only</span>
+        {% else %}
+          <span class="badge bg-secondary fs-6 px-3 py-2">{{ book.status }}</span>
+        {% endif %}
+      </div>
+      <div class="card-footer bg-white">
+        {% if not book.is_protected %}
+        <a href="{% url 'book_update' book.pk %}" class="btn btn-warning btn-sm w-100 mb-2">
+          <i class="bi bi-pencil me-1"></i> Edit Book
+        </a>
+        {% endif %}
+        <a href="{% url 'book_list' %}" class="btn btn-outline-secondary btn-sm w-100">
+          <i class="bi bi-arrow-left me-1"></i> Back to Books
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Details + history -->
+  <div class="col-md-8">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header bg-white fw-semibold pt-3">
+        <i class="bi bi-info-circle text-primary me-1"></i> Book Details
+      </div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4 text-muted">Book ID</dt>
+          <dd class="col-sm-8"><code>{{ book.book_id }}</code></dd>
+          <dt class="col-sm-4 text-muted">Genre</dt>
+          <dd class="col-sm-8">{{ book.genre }}</dd>
+          <dt class="col-sm-4 text-muted">Year</dt>
+          <dd class="col-sm-8">{{ book.year }}</dd>
+          <dt class="col-sm-4 text-muted">Copies</dt>
+          <dd class="col-sm-8">{{ book.copies }}</dd>
+          <dt class="col-sm-4 text-muted">Total Borrows</dt>
+          <dd class="col-sm-8"><span class="badge bg-primary">{{ book.total_borrows }}</span></dd>
+          <dt class="col-sm-4 text-muted">Added On</dt>
+          <dd class="col-sm-8">{{ book.added_on }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold pt-3">
+        <i class="bi bi-clock-history text-secondary me-1"></i>
+        Borrow History ({{ history.count }})
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr><th>Member</th><th>Issued</th><th>Due</th><th>Returned</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              {% for r in history %}
+              <tr>
+                <td>{{ r.member.name }}</td>
+                <td>{{ r.issue_date }}</td>
+                <td>{{ r.due_date }}</td>
+                <td>{{ r.return_date|default:"—" }}</td>
+                <td>
+                  {% if r.is_returned %}
+                    <span class="badge bg-success small">Returned</span>
+                  {% elif r.is_overdue %}
+                    <span class="badge bg-danger small">Overdue</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark small">Active</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="5" class="text-center text-muted py-3">No borrowing records yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
