@@ -278,11 +278,8 @@ For issues or questions, please open an issue in the repository.
 
 ---
 
-**Created**: 2024  
+**Created**: 2026  
 **Version**: 1.0
 =======
 # Library_Management_System
 >>>>>>> 14691feaf4ea604c88cc9cef8b475422411aa3e8
-=======
-# Library_Management_System
->>>>>>> d3b01f8882dd0399bdce9ddc6f11e545294e5ee0
