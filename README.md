@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Library Management System
 
 A comprehensive Django-based library management application for tracking books, members, and borrowing transactions with a complete CRUD interface and reporting capabilities.
@@ -278,3 +279,6 @@ For issues or questions, please open an issue in the repository.
 
 **Created**: 2024  
 **Version**: 1.0
+=======
+# Library_Management_System
+>>>>>>> 14691feaf4ea604c88cc9cef8b475422411aa3e8
